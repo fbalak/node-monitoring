@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from etcd import Client as etcd_client
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 import json
@@ -7,6 +8,7 @@ import os
 import platform
 import socket
 from sys import argv
+from tendrl.commons.config import load_config
 from tendrl.commons.utils.service import Service
 
 collectd_os_specifics = {
@@ -57,8 +59,24 @@ def main():
     conf_name = argv[1]
     data = json.loads(argv[2])
     ConfigManager(conf_name, data).generate_config_file()
+    config = load_config(
+        'node-monitoring',
+        '/etc/tendrl/node-monitoring/node-monitoring.conf.yaml'
+    )
+    central_store = etcd_client(
+        host=config['etcd_connection'],
+        port=config['etcd_port']
+    )
+    with open('/etc/machine-id') as f:
+        machine_id = f.read().strip('\n')
+    node_id = central_store.read(
+        '/indexes/machine_id/%s' % machine_id
+    ).value
     return Service(
-        'collectd'
+        'collectd',
+        publisher_id='node_monitoring',
+        node_id=node_id,
+        socket_path=config['logging_socket_path']
     ).restart()
 
 
