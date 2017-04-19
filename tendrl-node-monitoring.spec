@@ -1,5 +1,5 @@
 Name: tendrl-node-monitoring
-Version: 1.2.2
+Version: 1.2.3
 Release: 1%{?dist}
 BuildArch: noarch
 Summary: Module for Tendrl Node Monitoring
@@ -65,6 +65,9 @@ install -Dm 0655 tendrl/node_monitoring/plugins/* $RPM_BUILD_ROOT/usr/lib64/coll
 %{_unitdir}/tendrl-node-monitoring.service
 
 %changelog
+* Wed Apr 19 2017 Rohan Kanade <rkanade@redhat.com> - 1.2.3-1
+- Release tendrl-node-monitoring v1.2.3
+
 * Wed Apr 05 2017 Rohan Kanade <rkanade@redhat.com> - 1.2.2-1
 - Release tendrl-node-monitoring v1.2.2
 
