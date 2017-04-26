@@ -1,0 +1,11 @@
+<Plugin "python">
+    ModulePath "/usr/lib64/collectd/"
+
+    Import "glusterfs_peer_network_throughput"
+
+    <Module "glusterfs_peer_network_throughput">
+        Verbose "True"
+        peer_name "{{ peer_name }}"
+        Interval 30
+    </Module>
+</Plugin>
