@@ -8,10 +8,12 @@ if '/usr/lib64/collectd' in sys.path:
     is_collectd_imported = True
     sys.path.remove('/usr/lib64/collectd')
 from etcd import Client as etcd_client
+import socket
 from subprocess import check_output
 from tendrl.commons.config import load_config
 from tendrl.commons.event import Event
 from tendrl.commons.message import Message
+from tendrl.commons.utils.time_utils import now as tendrl_now
 
 tendrl_collectd_severity_map = {
     'FAILURE': 'CRITICAL',
@@ -29,6 +31,8 @@ central_store = etcd_client(
     host=config['etcd_connection'],
     port=config['etcd_port']
 )
+
+timestamp = tendrl_now().isoformat()
 
 if is_collectd_imported:
     sys.path.append('/usr/lib64/collectd')
@@ -63,7 +67,7 @@ def collectd_to_tendrl_alert(collectd_alert, collectd_message):
     tendrl_alert = {}
     tendrl_alert['source'] = "collectd"
     tendrl_alert['pid'] = check_output(["pidof", "collectd"]).strip()
-    tendrl_alert['time_stamp'] = collectd_alert['Time']
+    tendrl_alert['time_stamp'] = timestamp
     tendrl_alert['alert_type'] = collectd_alert['Type']
     tendrl_alert['severity'] = tendrl_collectd_severity_map[
         collectd_alert['Severity']
@@ -80,8 +84,12 @@ def collectd_to_tendrl_alert(collectd_alert, collectd_message):
         'cluster' in collectd_alert.get('Host')
     ):
         tags['cluster_id'] = collectd_alert.get('Host').split('_')[1]
+        tags['cluster_name'] = central_store.read(
+            '/clusters/%s/TendrlContext/cluster_name' % tags['cluster_id']
+        ).value
     if 'PluginInstance' in collectd_alert:
         tags['plugin_instance'] = collectd_alert['PluginInstance']
+    tags['fqdn'] = socket.getfqdn()
     tendrl_alert['tags'] = tags
     return tendrl_alert
 
