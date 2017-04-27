@@ -79,7 +79,8 @@ def read_callback(data=None):
         PLUGIN_NAME,
         'gauge',
         'used',
-        calc_network_throughput(CONFIG['peer_name'])
+        calc_network_throughput(CONFIG['peer_name']),
+        'cluster_network'
     )
 
 
