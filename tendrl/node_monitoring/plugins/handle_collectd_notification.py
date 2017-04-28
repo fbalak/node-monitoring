@@ -87,6 +87,9 @@ def collectd_to_tendrl_alert(collectd_alert, collectd_message):
         tags['cluster_name'] = central_store.read(
             '/clusters/%s/TendrlContext/cluster_name' % tags['cluster_id']
         ).value
+        tags['sds_name'] = central_store.read(
+            '/clusters/%s/TendrlContext/sds_name' % tags['cluster_id']
+        ).value
     if 'PluginInstance' in collectd_alert:
         tags['plugin_instance'] = collectd_alert['PluginInstance']
     tags['fqdn'] = socket.getfqdn()
