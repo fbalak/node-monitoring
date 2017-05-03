@@ -39,8 +39,8 @@ def _to_bytes(str):
     return int(str)
 
 
-def fetch_cluster_and_pool_utilization():
-    args = ['ceph', 'df']
+def fetch_cluster_and_pool_utilization(cluster_name):
+    args = ['ceph', 'df', '--cluster', cluster_name]
     cluster_stat = {}
     pool_stat = []
     try:
@@ -150,8 +150,8 @@ def fetch_cluster_and_pool_utilization():
         return cluster_stat, pool_stat
 
 
-def fetch_osd_utilization():
-    args = ['ceph', 'osd', 'df', '-f', 'json']
+def fetch_osd_utilization(cluster_name):
+    args = ['ceph', 'osd', 'df', '--cluster', cluster_name, '-f', 'json']
     try:
         p = subprocess.Popen(
             args,
@@ -195,7 +195,9 @@ def send_metric(
 
 def read_callback(data=None):
     global CONFIG
-    cluster_stats, pools_stats = fetch_cluster_and_pool_utilization()
+    cluster_stats, pools_stats = fetch_cluster_and_pool_utilization(
+        CONFIG['cluster_name']
+    )
     if cluster_stats:
         send_metric(
             'cluster_utilization',
@@ -237,7 +239,7 @@ def read_callback(data=None):
             float(pool_stat.get('pcnt_used')),
             plugin_instance=pool_stat.get('name')
         )
-    osd_utilizations = fetch_osd_utilization()
+    osd_utilizations = fetch_osd_utilization(CONFIG['cluster_name'])
     for osd_utilization in osd_utilizations['nodes']:
         send_metric(
             'osd_utilization',
