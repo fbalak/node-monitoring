@@ -12,6 +12,7 @@ BuildRequires: systemd
 BuildRequires: python-mock
 
 Requires: collectd
+Requires: collectd-ping
 Requires: python-jinja2
 Requires: tendrl-commons
 
