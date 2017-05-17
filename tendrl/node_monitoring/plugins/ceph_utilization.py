@@ -174,6 +174,45 @@ def fetch_osd_utilization(cluster_name):
         return None
 
 
+def fetch_rbd_utilizations(cluster_name, pools):
+    rbd_stats = []
+    for pool in pools:
+        args = [
+            'rbd',
+            'du',
+            '--cluster',
+            cluster_name,
+            '-p',
+            pool,
+            '--format',
+            'json'
+        ]
+        try:
+            p = subprocess.Popen(
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                stdin=open(os.devnull, "r"),
+                close_fds=True
+            )
+            stdout, stderr = p.communicate()
+            if stderr == "" and p.returncode == 0:
+                rbds = json.loads(stdout).get('images', {})
+                rbd_stats.append({
+                    'pool_name': pool,
+                    'rbds': rbds
+                })
+        except Exception as e:
+            collectd.info(
+                "Failed to fetch osd utilizations."
+                " The error is %s" % (
+                    str(e)
+                )
+            )
+            continue
+    return rbd_stats
+
+
 def send_metric(
     plugin_name,
     metric_type,
@@ -198,6 +237,7 @@ def read_callback(data=None):
     cluster_stats, pools_stats = fetch_cluster_and_pool_utilization(
         CONFIG['cluster_name']
     )
+    pools = []
     if cluster_stats:
         send_metric(
             'cluster_utilization',
@@ -218,6 +258,7 @@ def read_callback(data=None):
             float(cluster_stats.get('pcnt_used'))
         )
     for pool_stat in pools_stats:
+        pools.append(pool_stat.get('name'))
         send_metric(
             'pool_utilization',
             'gauge',
@@ -269,6 +310,37 @@ def read_callback(data=None):
             osd_utilization.get('kb_used') * 1024,
             plugin_instance=osd_utilization.get('name').replace('.', '_')
         )
+    rbd_utilizations = fetch_rbd_utilizations(CONFIG['cluster_name'], pools)
+    for rbd_utilization in rbd_utilizations:
+        pool_name = rbd_utilization.get('pool_name', '').replace('.', '_')
+        for rbd in rbd_utilization.get('rbds', []):
+            rbd_name = rbd.get('name').replace('.', '_')
+            send_metric(
+                'rbd_utilization',
+                'gauge',
+                'total',
+                rbd.get('provisioned_size'),
+                plugin_instance='pool_%s|name_%s' % (pool_name, rbd_name)
+            )
+            send_metric(
+                'rbd_utilization',
+                'gauge',
+                'used',
+                rbd.get('used_size'),
+                plugin_instance='pool_%s|name_%s' % (pool_name, rbd_name)
+            )
+            if rbd.get('provisioned_size') > 0:
+                send_metric(
+                    'rbd_utilization',
+                    'percent',
+                    'percent_bytes',
+                    float((
+                        rbd.get('used_size') * 100 * 1.0
+                    ) / (
+                        rbd.get('provisioned_size') * 1.0
+                    )),
+                    plugin_instance='pool_%s|name_%s' % (pool_name, rbd_name)
+                )
 
 
 collectd.register_config(configure_callback)
