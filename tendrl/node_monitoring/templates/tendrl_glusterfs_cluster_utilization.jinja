@@ -1,9 +1,9 @@
 <Plugin "python">
     ModulePath "/usr/lib64/collectd/"
 
-    Import "glusterfs_utilization"
+    Import "tendrl_glusterfs_utilization"
 
-    <Module "glusterfs_utilization">
+    <Module "tendrl_glusterfs_utilization">
         cluster_id "{{ cluster_id }}"
     </Module>
 </Plugin>
