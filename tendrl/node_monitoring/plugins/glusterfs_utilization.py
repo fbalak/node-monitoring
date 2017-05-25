@@ -74,7 +74,7 @@ def read_callback(data=None):
             'cluster_utilization',
             'gauge',
             'total',
-            stats.get('raw_capacity')
+            stats.get('usable_capacity')
         )
         send_metric(
             'cluster_utilization',
