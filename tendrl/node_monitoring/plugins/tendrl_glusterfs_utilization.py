@@ -94,7 +94,7 @@ def read_callback(data=None):
             (
                 stats.get('used_capacity') * 100
             ) / (
-                stats.get('raw_capacity') * 1.0
+                stats.get('usable_capacity') * 1.0
             )
         )
     if stats.get('volume_summary'):
