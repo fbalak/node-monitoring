@@ -1,9 +1,9 @@
 <Plugin "python">
     ModulePath "/usr/lib64/collectd/"
 
-    Import "ceph_utilization"
+    Import "tendrl_ceph_utilization"
 
-    <Module "ceph_utilization">
+    <Module "tendrl_ceph_utilization">
         Verbose "True"
         cluster_id "{{ cluster_id }}"
         cluster_name "{{cluster_name}}"

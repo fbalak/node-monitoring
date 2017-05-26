@@ -1,15 +1,16 @@
 <Plugin "python">
     ModulePath "/usr/lib64/collectd/"
 
-    Import "glusterfs_utilization"
+    Import "tendrl_glusterfs_brick_utilization"
 
-    <Module "glusterfs_utilization">
-        cluster_id "{{ cluster_id }}"
+    <Module "tendrl_glusterfs_brick_utilization">
+        cluster_id "{{cluster_id}}"
     </Module>
 </Plugin>
 
+
 <Plugin "threshold">
-    <Plugin "cluster_utilization">
+    <Plugin "brick_utilization">
        <Type "percent">
          Instance percent_bytes
          FailureMax {{ Failure }}

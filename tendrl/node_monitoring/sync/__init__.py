@@ -1,4 +1,5 @@
 from tendrl.commons.sds_sync import StateSyncThread
+import tendrl.node_monitoring.utils.central_store_util as central_store_util
 import gevent
 
 
@@ -8,5 +9,5 @@ class NodeMonitoringSyncStateThread(StateSyncThread):
 
     def _run(self):
         while not self._complete.is_set():
-            NS.central_store_thread.update_last_seen_at()
+            central_store_util.update_last_seen_at()
             gevent.sleep(3)
