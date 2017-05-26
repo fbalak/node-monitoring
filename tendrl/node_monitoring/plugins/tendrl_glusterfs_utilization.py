@@ -18,6 +18,8 @@ def configure_callback(configobj):
 
 def fetch_utilization():
     args = ["gstatus", "-o", "json"]
+    stdout = ""
+    stderr = ""
     try:
         p = subprocess.Popen(
             args,
@@ -33,7 +35,10 @@ def fetch_utilization():
     except Exception as e:
         collectd.info(
             "Failed to fetch cluster and volume utilizations."
+            " The gstatus o/p is stdout: %s, stderr: %s."
             " The error is %s" % (
+                stdout,
+                stderr,
                 str(e)
             )
         )

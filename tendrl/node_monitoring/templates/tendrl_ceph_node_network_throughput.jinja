@@ -1,9 +1,9 @@
 <Plugin "python">
     ModulePath "/usr/lib64/collectd/"
 
-    Import "ceph_node_network_throughput"
+    Import "tendrl_ceph_node_network_throughput"
 
-    <Module "ceph_node_network_throughput">
+    <Module "tendrl_ceph_node_network_throughput">
         Verbose "True"
         cluster_network "{{ cluster_network }}"
         public_network "{{ public_network }}"
