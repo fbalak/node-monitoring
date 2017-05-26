@@ -5,8 +5,6 @@ from tendrl.commons.event import Event
 from tendrl.commons.message import Message
 from tendrl.commons import manager as commons_manager
 from tendrl.commons import TendrlNS
-from tendrl.node_monitoring.central_store \
-    import NodeMonitoringEtcdCentralStore
 from tendrl.node_monitoring import NodeMonitoringNS
 from tendrl.node_monitoring.sync import NodeMonitoringSyncStateThread
 
@@ -18,7 +16,6 @@ class NodeMonitoringManager(commons_manager.Manager):
             self
         ).__init__(
             NS.state_sync_thread,
-            NS.central_store_thread
         )
 
 
@@ -28,7 +25,6 @@ def main():
     NS.type = "monitoring"
 
     complete = gevent.event.Event()
-    NS.central_store_thread = NodeMonitoringEtcdCentralStore()
 
     NS.state_sync_thread = NodeMonitoringSyncStateThread()
     NS.node_monitoring.definitions.save()
