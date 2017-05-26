@@ -134,6 +134,8 @@ def get_mount_stats(
     mount_points = _get_mounts(mount_path)
     lvs = get_lvs()
     mount_detail = {}
+    if not mount_points:
+        return mount_detail
     for mount, info in mount_points.iteritems():
         mount_detail[mount] = _get_stats(mount)
         mount_detail[mount].update(
@@ -165,9 +167,10 @@ def brick_utilization(path):
     }"""
     # Below logic will find mount_path from path
     mount_path = [path.split(":")[1]]
-    return get_mount_stats(
-        mount_path
-    ).values()[0]
+    mount_stats = get_mount_stats(mount_path)
+    if not mount_stats:
+        return None
+    return mount_stats.values()[0]
 
 
 def get_brick_utilization():
@@ -206,6 +209,8 @@ def get_brick_utilization():
                             brick_path
                         )
                     )
+                    if not utilization:
+                        continue
                     utilization['hostname'] = brick_hostname
                     utilization['brick_path'] = brick_path
                     utilizations.append(utilization)
