@@ -70,10 +70,9 @@ def read_callback(data=None):
     if not stats:
         return
     if (
-        stats.get('raw_capacity') and
         stats.get('usable_capacity') and
         stats.get('used_capacity') and
-        stats.get('raw_capacity') != 0
+        stats.get('usable_capacity') != 0
     ):
         send_metric(
             'cluster_utilization',
