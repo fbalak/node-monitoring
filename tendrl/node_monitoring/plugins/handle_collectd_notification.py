@@ -18,7 +18,8 @@ from tendrl.commons.utils.time_utils import now as tendrl_now
 tendrl_collectd_severity_map = {
     'FAILURE': 'CRITICAL',
     'WARNING': 'WARNING',
-    'OK': 'INFO'
+    'OK': 'INFO',
+    'OKAY': 'INFO'
 }
 
 
