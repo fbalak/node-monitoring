@@ -70,15 +70,15 @@ def read_callback(data=None):
     if not stats:
         return
     if (
-        stats.get('usable_capacity') and
+        stats.get('raw_capacity') and
         stats.get('used_capacity') and
-        stats.get('usable_capacity') != 0
+        stats.get('raw_capacity') != 0
     ):
         send_metric(
             'cluster_utilization',
             'gauge',
             'total',
-            stats.get('usable_capacity')
+            stats.get('raw_capacity')
         )
         send_metric(
             'cluster_utilization',
@@ -93,7 +93,7 @@ def read_callback(data=None):
             (
                 stats.get('used_capacity') * 100
             ) / (
-                stats.get('usable_capacity') * 1.0
+                stats.get('raw_capacity') * 1.0
             )
         )
     if stats.get('volume_summary'):
