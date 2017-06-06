@@ -24,6 +24,12 @@ collectd_os_specifics = {
         'moduledirconfig': '/usr/lib64/collectd/',
         'socketgroup': 'wheel',
     },
+    'redhat': {
+        'config': '/etc/collectd.conf',
+        'pluginconf': '/etc/collectd.d',
+        'moduledirconfig': '/usr/lib64/collectd/',
+        'socketgroup': 'wheel',
+    },
 }[platform.dist()[0]]
 
 TEMPLATE_ROOT = '/etc/collectd_template'
