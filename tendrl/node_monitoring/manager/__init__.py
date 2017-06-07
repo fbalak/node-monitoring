@@ -37,7 +37,7 @@ def main():
     def shutdown():
         Event(
             Message(
-                priority="info",
+                priority="debug",
                 publisher=NS.publisher_id,
                 payload={"message": "Signal handler: stopping"}
             )
