@@ -1,6 +1,6 @@
 Name: tendrl-node-monitoring
 Version: 1.4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 BuildArch: noarch
 Summary: Module for Tendrl Node Monitoring
 Source0: %{name}-%{version}.tar.gz
@@ -66,6 +66,10 @@ install -Dm 0655 tendrl/node_monitoring/plugins/* $RPM_BUILD_ROOT/usr/lib64/coll
 %{_unitdir}/tendrl-node-monitoring.service
 
 %changelog
+* Mon Jun 12 2017 Rohan Kanade <rkanade@redhat.com> - 1.4.1-2
+- Fixes https://github.com/Tendrl/node-monitoring/issues/51
+- Fixes https://github.com/Tendrl/node-monitoring/issues/52
+
 * Thu Jun 08 2017 Rohan Kanade <rkanade@redhat.com> - 1.4.1-1
 - Release tendrl-node-monitoring v1.4.1
 
