@@ -261,7 +261,7 @@ def read_callback(data=None):
                 'gauge',
                 'total',
                 brick_usage.get('total'),
-                plugin_instance="volume_%s|brick_%s:%s" % (
+                plugin_instance="volume_%s|host_%s|brick_%s" % (
                     vol,
                     brick_usage.get('hostname').replace(".", "_"),
                     brick_usage.get('brick_path').replace("/", "_")
@@ -272,7 +272,7 @@ def read_callback(data=None):
                 'gauge',
                 'used',
                 brick_usage.get('used'),
-                plugin_instance="volume_%s|brick_%s:%s" % (
+                plugin_instance="volume_%s|host_%s|brick_%s" % (
                     vol,
                     brick_usage.get('hostname').replace(".", "_"),
                     brick_usage.get('brick_path').replace("/", "_")
@@ -283,7 +283,7 @@ def read_callback(data=None):
                 'percent',
                 'percent_bytes',
                 brick_usage.get('used_percent'),
-                plugin_instance="volume_%s|brick_%s:%s" % (
+                plugin_instance="volume_%s|host_%s|brick_%s" % (
                     vol,
                     brick_usage.get('hostname').replace(".", "_"),
                     brick_usage.get('brick_path').replace("/", "_")
@@ -293,4 +293,3 @@ def read_callback(data=None):
 
 collectd.register_config(configure_callback)
 collectd.register_read(read_callback, 60)
-
