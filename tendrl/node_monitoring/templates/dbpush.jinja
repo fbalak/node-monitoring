@@ -2,7 +2,7 @@ LoadPlugin "write_graphite"
 
 <Plugin write_graphite>
     <Node "{{ hostname }}">
-        Host "{{ master_name }}"
+        Host "{{ time_series_db_server }}"
         Port "2003"
         Protocol "tcp"
         LogSendErrors true
