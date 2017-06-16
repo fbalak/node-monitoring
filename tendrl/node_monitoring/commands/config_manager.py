@@ -82,7 +82,8 @@ def main():
         'collectd',
         publisher_id='node_monitoring',
         node_id=node_id,
-        socket_path=config['logging_socket_path']
+        socket_path=config['logging_socket_path'],
+        enabled=True
     ).restart()
 
 

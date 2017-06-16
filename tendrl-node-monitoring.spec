@@ -44,6 +44,7 @@ install -Dm 0655 tendrl/node_monitoring/templates/*.jinja $RPM_BUILD_ROOT%{_sysc
 install -Dm 0655 tendrl/node_monitoring/plugins/* $RPM_BUILD_ROOT/usr/lib64/collectd/.
 
 %post
+systemctl enable tendrl-node-monitoring
 %systemd_post tendrl-node-monitoring.service
 
 %preun
