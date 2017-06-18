@@ -30,7 +30,11 @@ def main():
     NS.node_monitoring.definitions.save()
     NS.node_monitoring.config.save()
     NS.publisher_id = "node_monitoring"
-
+    
+    if NS.config.data.get("with_internal_profiling", False):
+        from tendrl.commons import profiler
+        profiler.start()
+        
     manager = NodeMonitoringManager()
     manager.start()
 
