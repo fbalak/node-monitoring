@@ -38,10 +38,11 @@ def fetch_cluster_iops(cluster_name):
         result = json.loads(stdout)
         return (
             result['pg_stats_sum']['stat_sum']['num_read'],
-            result['pg_stats_sum']['stat_sum']['num_write']
+            result['pg_stats_sum']['stat_sum']['num_write'],
+            ''
         )
     else:
-        raise Exception('%s' % stderr)
+        return (0, 0, stderr)
 
 
 def send_metric(
@@ -66,7 +67,15 @@ def send_metric(
 def read_callback(data=None):
     global CONFIG
     try:
-        iops_read, iops_write = fetch_cluster_iops(CONFIG['cluster_name'])
+        iops_read, iops_write, err = fetch_cluster_iops(CONFIG['cluster_name'])
+        if err:
+            collectd.error(
+                "Failed to fetch cluster iops"
+                " The error is %s" % (
+                    err
+                )
+            )
+            return
         send_metric(
             'cluster_iops_write',
             'gauge',
@@ -85,8 +94,13 @@ def read_callback(data=None):
             'total',
             iops_read + iops_write
         )
-    except Exception as ex:
-        collectd.info(
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        subprocess.CalledProcessError
+    ) as ex:
+        collectd.error(
             "Failed to fetch cluster iops"
             " The error is %s" % (
                 str(ex)
