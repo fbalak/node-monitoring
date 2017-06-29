@@ -31,9 +31,23 @@ def fetch_utilization():
         stdout, stderr = p.communicate()
         if stderr == "" and p.returncode == 0:
             result = json.loads(stdout[stdout.index('{'): -1])
-        return result
-    except Exception as e:
-        collectd.info(
+            return result
+        else:
+            collectd.error(
+                "Failed to fetch cluster and volume utilizations."
+                " The gstatus o/p is stdout: %s, stderr: %s." % (
+                    stdout,
+                    stderr
+                )
+            )
+            return None
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        subprocess.CalledProcessError
+    ) as e:
+        collectd.error(
             "Failed to fetch cluster and volume utilizations."
             " The gstatus o/p is stdout: %s, stderr: %s."
             " The error is %s" % (

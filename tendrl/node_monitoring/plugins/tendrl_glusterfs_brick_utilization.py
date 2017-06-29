@@ -70,21 +70,31 @@ def get_lvs():
             close_fds=True
         )
         stdout, stderr = cmd.communicate()
-        out = stdout.split('\n')[:-1]
-        l = map(lambda x: dict(x),
-                map(lambda x: [e.split('=') for e in x],
-                    map(lambda x: x.strip().split('$'), out)))
+        if stderr:
+            collectd.error(
+                'Failed to fetch lvs. Error %s' % stderr
+            )
+        else:
+            out = stdout.split('\n')[:-1]
+            l = map(lambda x: dict(x),
+                    map(lambda x: [e.split('=') for e in x],
+                        map(lambda x: x.strip().split('$'), out)))
 
-        d = {}
-        for i in l:
-            if i['LVM2_LV_ATTR'][0] == 't':
-                k = "%s/%s" % (i['LVM2_VG_NAME'], i['LVM2_LV_NAME'])
-            else:
-                k = os.path.realpath(i['LVM2_LV_PATH'])
-            d.update({k: i})
-        return d
-    except Exception as ex:
-        collectd.info('Failed to fetch lvs. Error %s' % str(ex))
+            d = {}
+            for i in l:
+                if i['LVM2_LV_ATTR'][0] == 't':
+                    k = "%s/%s" % (i['LVM2_VG_NAME'], i['LVM2_LV_NAME'])
+                else:
+                    k = os.path.realpath(i['LVM2_LV_PATH'])
+                d.update({k: i})
+            return d
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        subprocess.CalledProcessError
+    ) as ex:
+        collectd.error('Failed to fetch lvs. Error %s' % str(ex))
         return None
 
 
@@ -187,37 +197,50 @@ def get_brick_utilization():
             close_fds=True
         )
         stdout, stderr = cmd.communicate()
-        root = ElementTree.fromstring(stdout)
-        root_iterator = root.find('volStatus').find(
-            'volumes'
-        ).iter('volume')
-        for v in root_iterator:
-            volName = v.find('volName').text
-            try:
-                node_iterator = v.iter('node')
-            except AttributeError:
-                # python 2.6 does not have iter
-                node_iterator = v.getiterator('node')
-            utilizations = []
-            for n in node_iterator:
-                brick_hostname = n.find('hostname').text
-                brick_path = n.find('path').text
-                if brick_hostname == socket.gethostname():
-                    utilization = brick_utilization(
-                        "%s:%s" % (
-                            brick_hostname,
-                            brick_path
-                        )
-                    )
-                    if not utilization:
-                        continue
-                    utilization['hostname'] = brick_hostname
-                    utilization['brick_path'] = brick_path
-                    utilizations.append(utilization)
-            ret_val[volName] = utilizations
+        if stderr:
+            collectd.error(
+                'Failed to fetch brick utilizations. The error is: %s' % (
+                    stderr
+                )
+            )
             return ret_val
-    except Exception as e:
-        collectd.info(
+        else:
+            root = ElementTree.fromstring(stdout)
+            root_iterator = root.find('volStatus').find(
+                'volumes'
+            ).iter('volume')
+            for v in root_iterator:
+                volName = v.find('volName').text
+                try:
+                    node_iterator = v.iter('node')
+                except AttributeError:
+                    # python 2.6 does not have iter
+                    node_iterator = v.getiterator('node')
+                utilizations = []
+                for n in node_iterator:
+                    brick_hostname = n.find('hostname').text
+                    brick_path = n.find('path').text
+                    if brick_hostname == socket.gethostname():
+                        utilization = brick_utilization(
+                            "%s:%s" % (
+                                brick_hostname,
+                                brick_path
+                            )
+                        )
+                        if not utilization:
+                            continue
+                        utilization['hostname'] = brick_hostname
+                        utilization['brick_path'] = brick_path
+                        utilizations.append(utilization)
+                ret_val[volName] = utilizations
+                return ret_val
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        subprocess.CalledProcessError
+    ) as e:
+        collectd.error(
             'Failed to fetch brick utilizations. The error is: %s' % (
                 str(e)
             )
