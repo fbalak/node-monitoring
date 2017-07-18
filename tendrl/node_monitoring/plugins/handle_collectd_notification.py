@@ -84,12 +84,12 @@ def collectd_to_tendrl_alert(collectd_alert, collectd_message):
         'Host' in collectd_alert and
         'cluster' in collectd_alert.get('Host')
     ):
-        tags['cluster_id'] = collectd_alert.get('Host').split('_')[1]
+        tags['integration_id'] = collectd_alert.get('Host').split('_')[1]
         tags['cluster_name'] = central_store.read(
-            '/clusters/%s/TendrlContext/cluster_name' % tags['cluster_id']
+            '/clusters/%s/TendrlContext/cluster_name' % tags['integration_id']
         ).value
         tags['sds_name'] = central_store.read(
-            '/clusters/%s/TendrlContext/sds_name' % tags['cluster_id']
+            '/clusters/%s/TendrlContext/sds_name' % tags['integration_id']
         ).value
     if 'PluginInstance' in collectd_alert:
         tags['plugin_instance'] = collectd_alert['PluginInstance']

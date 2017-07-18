@@ -238,7 +238,7 @@ def send_metric(
     global CONFIG
     metric = collectd.Values()
     metric.plugin = plugin_name
-    metric.host = "cluster_%s" % CONFIG['cluster_id']
+    metric.host = "cluster_%s" % CONFIG['integration_id']
     metric.type = metric_type
     metric.values = [value]
     metric.type_instance = instance_name
